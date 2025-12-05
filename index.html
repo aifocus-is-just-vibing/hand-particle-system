@@ -554,10 +554,14 @@
                     const globalIdx = offset + i;
                     if (globalIdx >= PARTICLE_COUNT) break;
 
-                    const conn = connections[Math.floor(Math.random() * connections.length)];
+                    // 修改點：固定分配粒子到特定骨骼，避免隨機跳動
+                    const connIndex = i % connections.length;
+                    const conn = connections[connIndex];
+                    
                     const p1 = landmarks[conn[0]];
                     const p2 = landmarks[conn[1]];
                     
+                    // 隨機分布在骨骼線上，但保持粒子屬於該骨骼
                     const t = Math.random();
                     const lx = p1.x + (p2.x - p1.x) * t;
                     const ly = p1.y + (p2.y - p1.y) * t;
