@@ -290,7 +290,7 @@
                 <b>手勢指令：</b><br>
                 ✋ <b>雙手張開：</b> 粒子擴散<br>
                 ✊ <b>雙手靠近：</b> 粒子凝聚<br>
-                👋 <b>單手移動：</b> 視角旋轉<br>
+                👋 <b>單手移動：</b> <b>控制旋轉速度</b><br>
                 🙌 <b>雙手模式：</b> 粒子變成您的雙手
             </div>
         </div>
@@ -621,6 +621,13 @@
             const currentPos = posAttr.array;
             const lerpSpeed = 0.08;
             
+            // 手勢數值衰減 (當沒有偵測到手時，平滑回歸)
+            if (isCameraActive && latestLandmarks.length === 0) {
+                 handRotationX *= 0.95;
+                 handRotationY *= 0.95;
+                 handExpansion += (0.2 - handExpansion) * 0.05; // 平滑回歸到微小狀態
+            }
+
             if (currentShape === 'hands') {
                 updateParticlesToHands();
             }
@@ -648,14 +655,23 @@
 
             if (isCameraActive) {
                 if (currentShape !== 'hands') {
-                    particleSystem.rotation.y += (handRotationX - particleSystem.rotation.y) * 0.05;
+                    // 改為速度控制 (Speed Control)
+                    // 基礎速度 0.002
+                    // handRotationX 約 -2.0 ~ 2.0 -> 旋轉速度影響約 -0.02 ~ 0.02
+                    const rotationSpeed = 0.002 + (handRotationX * 0.01); 
+                    particleSystem.rotation.y += rotationSpeed;
+                    
+                    // X軸保持傾斜控制，但稍微放寬限制，並增加滑順度
                     particleSystem.rotation.x += (handRotationY - particleSystem.rotation.x) * 0.05;
                 } else {
+                    // 手部模式下，輕微回正
                     particleSystem.rotation.y += (0 - particleSystem.rotation.y) * 0.05;
                     particleSystem.rotation.x += (0 - particleSystem.rotation.x) * 0.05;
                 }
             } else {
-                particleSystem.rotation.y += 0.002 + (mouseX * 0.0005);
+                // 滑鼠模式：自動旋轉 + 滑鼠影響速度
+                const mouseRotationSpeed = 0.002 + (mouseX * 0.0001);
+                particleSystem.rotation.y += mouseRotationSpeed;
                 particleSystem.rotation.x += (-mouseY * 0.0005 - particleSystem.rotation.x) * 0.05;
             }
 
