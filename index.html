@@ -407,13 +407,13 @@
 
             const sprite = createGlowTexture();
             material = new THREE.PointsMaterial({
-                size: 6,
+                size: 20, // 增大粒子尺寸 (原為6)
                 map: sprite,
                 vertexColors: true,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false,
                 transparent: true,
-                opacity: 0.8
+                opacity: 0.95 // 提升不透明度 (原為0.8)
             });
 
             particleSystem = new THREE.Points(geometry, material);
@@ -699,7 +699,7 @@
             const ctx = canvas.getContext('2d');
             const grad = ctx.createRadialGradient(16,16,0, 16,16,16);
             grad.addColorStop(0, 'rgba(255,255,255,1)');
-            grad.addColorStop(0.3, 'rgba(255,255,255,0.4)');
+            grad.addColorStop(0.4, 'rgba(255,255,255,0.5)'); // 加大中心亮區
             grad.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = grad;
             ctx.fillRect(0,0,32,32);
